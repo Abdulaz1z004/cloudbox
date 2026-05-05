@@ -1,0 +1,37 @@
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="8" fill="#0D9488"/><path d="M10 26 Q10 18 20 18 Q22 12 28 14 Q34 14 34 20 Q38 20 38 25 L10 25Z" fill="white" opacity="0.9"/><rect x="11" y="25" width="22" height="3" rx="1.5" fill="white"/></svg>
+    <span class="brand-name">CloudBox</span>
+  </div>
+  <div class="sidebar-section-label">MAIN</div>
+  <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </a>
+  <a href="{{ url_for('upload') }}" class="sidebar-link {% if request.endpoint == 'upload' %}active{% endif %}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+    Files
+  </a>
+  <a href="#" class="sidebar-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    Shared Links
+  </a>
+  <a href="{{ url_for('contacts') }}" class="sidebar-link {% if request.endpoint == 'contacts' %}active{% endif %}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Clients
+  </a>
+  <a href="#" class="sidebar-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+    Settings
+  </a>
+  <div class="sidebar-storage">
+    <div class="sidebar-section-label">STORAGE</div>
+    <p class="storage-label">{{ sidebar_storage_used }} of 10 GB used</p>
+    <div class="storage-bar-wrap"><div class="storage-bar" style="width:{{ sidebar_storage_pct }}%"></div></div>
+    <button class="btn btn-outline btn-full mt-8" style="font-size:12px">Upgrade Plan</button>
+  </div>
+  <a href="{{ url_for('logout') }}" class="sidebar-link sidebar-logout">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Logout
+  </a>
+</nav>

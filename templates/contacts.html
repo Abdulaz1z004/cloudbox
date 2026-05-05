@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CloudBox – Clients</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body class="app-body">
+{% include 'sidebar.html' %}
+<div class="main-content">
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">Clients</h1>
+      <p class="page-subtitle">Manage all your clients and their access.</p>
+    </div>
+    <div class="topbar-right">
+      <div class="user-info">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span>{{ session.account_name }}</span>
+        <span class="plan-badge">Plan: {{ session.account_plan }}</span>
+      </div>
+      <button class="btn btn-primary ml-16" onclick="openModal('add-modal')">+ Add Client</button>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <div class="alert alert-success mb-16">{{ messages[0] }}</div>
+  {% endif %}
+  {% endwith %}
+
+  <div class="card">
+    <table class="contact-table">
+      <thead>
+        <tr><th>Name</th><th>Email</th><th>Company</th><th>Storage Used</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for c in contacts %}
+        <tr>
+          <td>
+            <div class="avatar-cell">
+              <div class="avatar">{{ c.full_name[:2].upper() }}</div>
+              {{ c.full_name }}
+            </div>
+          </td>
+          <td>{{ c.email }}</td>
+          <td>{{ c.company }}</td>
+          <td>{{ c.storage_used }}</td>
+          <td>
+            {% if c.status == 'Active' %}<span class="badge badge-green">Active</span>
+            {% elif c.status == 'Pending' %}<span class="badge badge-yellow">Pending</span>
+            {% else %}<span class="badge badge-gray">{{ c.status }}</span>{% endif %}
+          </td>
+          <td class="actions-cell">
+            <button class="btn-action btn-edit" onclick="openEditModal({{ c.id }})">✏ Edit</button>
+            <form method="post" action="{{ url_for('delete_contact', cid=c.id) }}" style="display:inline" onsubmit="return confirm('Delete this client?')">
+              <button type="submit" class="btn-action btn-delete">🗑 Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+        {% if not contacts %}
+        <tr><td colspan="6" class="empty-state">No clients yet. Click "+ Add Client" to add one.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+    <div class="pagination-row">
+      <span class="pagination-info">Showing {{ (page-1)*5+1 }} to {{ [(page)*5, total]|min }} of {{ total }} clients</span>
+      <div class="pagination-btns">
+        {% if page > 1 %}<a href="?page={{ page-1 }}" class="page-btn">‹</a>{% endif %}
+        {% for p in range(1, total_pages+1) %}
+        <a href="?page={{ p }}" class="page-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+        {% endfor %}
+        {% if page < total_pages %}<a href="?page={{ page+1 }}" class="page-btn">›</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal-overlay" id="add-modal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Add Client</h2>
+      <button class="modal-close" onclick="closeModal('add-modal')">×</button>
+    </div>
+    <form method="post" action="{{ url_for('add_contact') }}">
+      <div class="modal-grid">
+        <div class="form-group"><label>Full Name</label><input type="text" name="full_name" placeholder="Enter full name" required class="form-control"/></div>
+        <div class="form-group"><label>Email</label><input type="email" name="email" placeholder="Enter email address" required class="form-control"/></div>
+        <div class="form-group"><label>Company</label><input type="text" name="company" placeholder="Enter company name" class="form-control"/></div>
+        <div class="form-group"><label>Storage Limit</label>
+          <select name="storage_limit" class="form-control">
+            <option>1 GB</option><option>2 GB</option><option selected>5 GB</option><option>10 GB</option><option>20 GB</option><option>50 GB</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Status</label>
+          <select name="status" class="form-control"><option>Active</option><option>Pending</option><option>Inactive</option></select>
+        </div>
+        <div class="form-group"><label>Plan</label>
+          <select name="plan" class="form-control"><option>Free</option><option selected>Pro</option><option>Enterprise</option></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('add-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Client</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="edit-modal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Edit Client</h2>
+      <button class="modal-close" onclick="closeModal('edit-modal')">×</button>
+    </div>
+    <form method="post" id="edit-form" action="">
+      <div class="modal-grid">
+        <div class="form-group"><label>Full Name</label><input type="text" name="full_name" id="edit-full-name" required class="form-control"/></div>
+        <div class="form-group"><label>Email</label><input type="email" name="email" id="edit-email" required class="form-control"/></div>
+        <div class="form-group"><label>Company</label><input type="text" name="company" id="edit-company" class="form-control"/></div>
+        <div class="form-group"><label>Storage Limit</label>
+          <select name="storage_limit" id="edit-storage" class="form-control">
+            <option>1 GB</option><option>2 GB</option><option>5 GB</option><option>10 GB</option><option>20 GB</option><option>50 GB</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Status</label>
+          <select name="status" id="edit-status" class="form-control"><option>Active</option><option>Pending</option><option>Inactive</option></select>
+        </div>
+        <div class="form-group"><label>Plan</label>
+          <select name="plan" id="edit-plan" class="form-control"><option>Free</option><option>Pro</option><option>Enterprise</option></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('edit-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/contacts.js') }}"></script>
+</body>
+</html>
