@@ -42,7 +42,7 @@ def init_db():
             id SERIAL PRIMARY KEY,
             email VARCHAR(255) UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
-            full_name VARCHAR(255),
+            account_name VARCHAR(255),
             plan VARCHAR(50) DEFAULT 'Pro',
             created_at TIMESTAMP DEFAULT NOW()
         );
@@ -122,7 +122,7 @@ def login():
         try:
             conn = get_db()
             cur = conn.cursor()
-            cur.execute("SELECT id, password_hash, full_name, plan FROM accounts WHERE email=%s", (email,))
+            cur.execute("SELECT id, password_hash, account_name, plan FROM accounts WHERE email=%s", (email,))
             row = cur.fetchone()
             cur.close()
             conn.close()
@@ -141,7 +141,7 @@ def login():
 def register():
     error = None
     if request.method == 'POST':
-        full_name = request.form.get('full_name', '').strip()
+        account_name = request.form.get('full_name', '').strip()
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         if not email or not password:
@@ -151,8 +151,8 @@ def register():
                 conn = get_db()
                 cur = conn.cursor()
                 cur.execute(
-                    "INSERT INTO accounts (email, password_hash, full_name) VALUES (%s,%s,%s)",
-                    (email, generate_password_hash(password), full_name)
+                    "INSERT INTO accounts (email, password_hash, account_name) VALUES (%s,%s,%s)",
+                    (email, generate_password_hash(password), account_name)
                 )
                 conn.commit()
                 cur.close()
