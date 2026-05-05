@@ -1,3 +1,11 @@
+// Update label when file is selected
+function handleFileSelect(input) {
+  var label = document.getElementById('file-label');
+  if (label && input.files && input.files.length > 0) {
+    label.textContent = input.files[0].name;
+  }
+}
+
 // Real XHR upload with true progress tracking
 document.getElementById('upload-form').addEventListener('submit', function(e) {
   e.preventDefault();
